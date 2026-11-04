@@ -1,0 +1,22 @@
+# RESPONSIBILITY: Dockerfile.frontend
+# --------------------------------------
+# Builds the Docker image for the Streamlit frontend service.
+# - Uses Python 3.11 slim as the base image
+# - Installs only frontend dependencies (streamlit, requests)
+# - Exposes port 8501 (publicly accessible on AWS EC2)
+# - Starts Streamlit app on container startup
+# - The API_URL environment variable points to the FastAPI backend
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir streamlit requests
+
+COPY frontend/ ./frontend/
+
+EXPOSE 8501
+
+CMD ["streamlit", "run", "frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+

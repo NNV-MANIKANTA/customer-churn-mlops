@@ -1,0 +1,48 @@
+# RESPONSIBILITY: docker-compose.yml
+# ------------------------------------
+# Orchestrates all services of the application.
+# Services:
+#   backend  → FastAPI (port 8000, internal only)
+#   frontend → Streamlit (port 8501, public-facing)
+# Both services share a custom Docker network so they can communicate.
+# Start everything with: docker compose up -d
+# Stop everything with: docker compose down
+# View logs with: docker compose logs -f
+
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: churn-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - churn-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: churn-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - churn-network
+    restart: unless-stopped
+
+networks:
+  churn-network:
+    driver: bridge
+

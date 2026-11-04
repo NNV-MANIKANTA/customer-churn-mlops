@@ -1,0 +1,33 @@
+# RESPONSIBILITY: params.yaml
+# ------------------------------
+# Central configuration file for all model hyperparameters.
+# Read by train.py using PyYAML.
+# Change values here — no need to touch source code.
+
+data:
+  raw_path: data/raw/dataset.csv
+  train_path: data/processed/train.csv
+  test_path: data/processed/test.csv
+  test_size: 0.2
+  random_state: 42
+
+model:
+  artifact_path: artifacts/model/model.joblib
+  experiment_name: customer-churn-experiment
+
+logistic_regression:
+  max_iter: 1000
+  C: 1.0
+  solver: lbfgs
+
+decision_tree:
+  max_depth: 5
+  min_samples_split: 10
+  random_state: 42
+
+random_forest:
+  n_estimators: 100
+  max_depth: 10
+  min_samples_split: 5
+  random_state: 42
+

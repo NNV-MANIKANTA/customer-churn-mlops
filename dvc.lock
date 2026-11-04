@@ -1,0 +1,89 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python -m src.data.preprocess
+    deps:
+    - path: data/raw/dataset.csv
+      hash: md5
+      md5: 0f9de68e012bd3aed5fa7cdc9fc421af
+      size: 977501
+    - path: params.yaml
+      hash: md5
+      md5: 865434880fcacc4bca45b6d913db3960
+      size: 695
+    - path: src/data/preprocess.py
+      hash: md5
+      md5: 002c4d6296899f2bd052c0f616b41503
+      size: 7846
+    - path: src/features/build_features.py
+      hash: md5
+      md5: 869a5a8456dbdc533548c1c578a8bda7
+      size: 1627
+    params:
+      params.yaml:
+        data.random_state: 42
+        data.test_size: 0.2
+    outs:
+    - path: artifacts/model/preprocessor.joblib
+      hash: md5
+      md5: bf5e34debe91db1e24b10c229333c2e9
+      size: 6710
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 3501d9472f41a7565be6ca660f557c15
+      size: 330053
+    - path: data/processed/train.csv
+      hash: md5
+      md5: fbcf5fd2d29821c23c852f2a70b12697
+      size: 1315927
+  train:
+    cmd: python -m src.models.train
+    deps:
+    - path: artifacts/model/preprocessor.joblib
+      hash: md5
+      md5: bf5e34debe91db1e24b10c229333c2e9
+      size: 6710
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 3501d9472f41a7565be6ca660f557c15
+      size: 330053
+    - path: data/processed/train.csv
+      hash: md5
+      md5: fbcf5fd2d29821c23c852f2a70b12697
+      size: 1315927
+    - path: params.yaml
+      hash: md5
+      md5: 865434880fcacc4bca45b6d913db3960
+      size: 695
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 3867054d4fc128629344cff5d1b2e647
+      size: 4320
+    - path: src/models/train.py
+      hash: md5
+      md5: db5037ddca77997f65bb4dbd3c4b4838
+      size: 9926
+    params:
+      params.yaml:
+        decision_tree:
+          max_depth: 5
+          min_samples_split: 10
+          random_state: 42
+        logistic_regression:
+          max_iter: 1000
+          C: 1.0
+          solver: lbfgs
+        random_forest:
+          n_estimators: 100
+          max_depth: 10
+          min_samples_split: 5
+          random_state: 42
+    outs:
+    - path: artifacts/model/model.joblib
+      hash: md5
+      md5: a1d1ab3bd02dfc83bc828b9b4f6a9003
+      size: 9930
+    - path: metrics.json
+      hash: md5
+      md5: 9cd2c1ed37ff640332390842ef245514
+      size: 227

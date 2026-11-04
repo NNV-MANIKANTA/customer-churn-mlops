@@ -1,0 +1,55 @@
+# RESPONSIBILITY: .github/workflows/ci.yml
+# ------------------------------------------
+# GitHub Actions CI pipeline — runs automatically on every push to main branch.
+# Steps:
+#   1. Checkout code
+#   2. Set up Python 3.11
+#   3. Install dependencies from requirements.txt
+#   4. Run preprocessing (creates train.csv, test.csv)
+#   5. Run model training (creates model.joblib)
+#   6. Run all Pytest tests
+#   7. (Optional) Build Docker images to verify Dockerfiles
+# Ensures code is always in a working state before deployment.
+
+name: Customer Churn MLOps CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Copy dataset
+        run: cp data/raw/dataset.csv data/raw/dataset.csv || true
+
+      - name: Run preprocessing
+        run: python -m src.data.preprocess
+
+      - name: Run model training
+        run: python -m src.models.train
+
+      - name: Run tests
+        run: pytest -v
+
+      - name: Build Docker backend image
+        run: docker build -t churn-backend -f Dockerfile .
+
+      - name: Build Docker frontend image
+        run: docker build -t churn-frontend -f Dockerfile.frontend .
+

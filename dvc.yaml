@@ -1,0 +1,35 @@
+# DVC Pipeline definition for Customer Churn Prediction
+stages:
+  preprocess:
+    cmd: python -m src.data.preprocess
+    deps:
+      - src/data/preprocess.py
+      - src/features/build_features.py
+      - data/raw/dataset.csv
+      - params.yaml
+    params:
+      - data.test_size
+      - data.random_state
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - artifacts/model/preprocessor.joblib
+
+  train:
+    cmd: python -m src.models.train
+    deps:
+      - src/models/train.py
+      - src/models/evaluate.py
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - artifacts/model/preprocessor.joblib
+      - params.yaml
+    params:
+      - logistic_regression
+      - decision_tree
+      - random_forest
+    outs:
+      - artifacts/model/model.joblib
+    metrics:
+      - metrics.json:
+          cache: false
